@@ -16,7 +16,6 @@ public final class R {
         public static final int self=0x7f020002;
     }
     public static final class id {
-        public static final int EditMessage=0x7f050002;
         public static final int layout_root=0x7f050000;
         public static final int mapview=0x7f050001;
     }

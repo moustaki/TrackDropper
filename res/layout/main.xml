@@ -14,11 +14,4 @@
     android:clickable="true"
     android:apiKey="08Sr5fr5uGrYvsVHYbd9hNedYb_jk0ji0VGkhIg"
 />
-<android.widget.EditText  
-   android:id="@+id/EditMessage"  
-   android:layout_height="wrap_content"  
-   android:hint="Message"  
-   android:inputType="text"  
-   android:layout_width="fill_parent">  
-</android.widget.EditText>  
 </LinearLayout>
