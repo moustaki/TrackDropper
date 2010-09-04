@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="10dp"
+              >
 <com.google.android.maps.MapView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mapview"
@@ -7,3 +14,11 @@
     android:clickable="true"
     android:apiKey="08Sr5fr5uGrYvsVHYbd9hNedYb_jk0ji0VGkhIg"
 />
+<android.widget.EditText  
+   android:id="@+id/EditMessage"  
+   android:layout_height="wrap_content"  
+   android:hint="Message"  
+   android:inputType="text"  
+   android:layout_width="fill_parent">  
+</android.widget.EditText>  
+</LinearLayout>
