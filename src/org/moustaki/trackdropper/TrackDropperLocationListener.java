@@ -46,6 +46,8 @@ public class TrackDropperLocationListener implements LocationListener {
             
             OverlayItem self = new OverlayItem(this.currentLocation, "", "");
             this.selfOverlay.addOverlay(self);
+            
+            this.context.updateNearbyTracks();
 		}
 	}
 	

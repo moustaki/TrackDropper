@@ -33,6 +33,7 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.OverlayItem;
 
 import android.provider.MediaStore.Audio.Media;
 
@@ -45,9 +46,10 @@ public class TrackDropper extends MapActivity {
     private MapView mv;
     private LocationManager lm;
     private TrackDropperLocationListener ll;
+    private TrackOverlay trackOverlay;
     private boolean running;
     
-    private String base = "http://10.195.80.235:6666";
+    private String base = "http://piracy.heroku.com"; //"http://10.195.80.235:6666";
     
     /** Called when the activity is first created. */
     @Override
@@ -68,6 +70,11 @@ public class TrackDropper extends MapActivity {
         this.mv.getOverlays().add(selfOverlay);
         this.ll = new TrackDropperLocationListener(this, selfOverlay);
         this.lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
+        
+        // Setting track overlay
+        Drawable trackDrawable = this.getResources().getDrawable(R.drawable.music);
+        this.trackOverlay = new TrackOverlay(trackDrawable, this);
+        this.mv.getOverlays().add(this.trackOverlay);
         
         this.running = true;
     }
@@ -142,8 +149,8 @@ public class TrackDropper extends MapActivity {
                  GeoPoint point = getLocationListener().getCurrentLocation();
                  HashMap<String,String> data = new HashMap<String,String>();
                  
-                 data.put("lat", ""+point.getLatitudeE6());
-                 data.put("lng", ""+point.getLongitudeE6());
+                 data.put("lat", ""+point.getLatitudeE6() / 1000000.0);
+                 data.put("lng", ""+point.getLongitudeE6()/ 1000000.0);
                  data.put("artist_name", artist);
                  data.put("track_name", title);
                  postJSON("/tracks", data);
@@ -156,20 +163,29 @@ public class TrackDropper extends MapActivity {
          return true;
      }
      
-     public void getNearbyTracks() {
-         Thread getNearbyTracks = new Thread() {
-             public void run() {
-                 try {
-                     while (running) {
-                         Thread.sleep(1000 * 10);
-                     }
-                 } catch (InterruptedException e) {
-                     e.printStackTrace();
-                 }
-             }
-         };
-         getNearbyTracks.start();
-         return;
+     public void updateNearbyTracks() {
+        GeoPoint point = getLocationListener().getCurrentLocation();
+        JSONObject response = getJSON("/tracks.json?lat="+point.getLatitudeE6() / 1000000.0+"&lng="+point.getLongitudeE6()/ 1000000.0);
+        trackOverlay.reset();
+        try {
+            for (int i = 0; i < response.getJSONArray("tracks").length(); i++) {
+                JSONObject track = response.getJSONArray("tracks").getJSONObject(i);
+                double lat = track.optDouble("lat");
+                double lng = track.optDouble("lng");
+                Double lat2 = lat * 1E6;
+                Double lng2 = lng * 1E6;
+                GeoPoint tp = new GeoPoint(lat2.intValue(), lng2.intValue());
+                String trackName = track.getString("track_name");
+                String artistName = track.getString("artist_name");
+                String url = track.getString("url");
+                double distance = track.optDouble("distance") * 1000;
+                Track trackItem = new Track(tp, artistName, trackName, distance, url);
+                trackOverlay.add(trackItem);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return;
      }
      
      public TrackDropper getTrackDropper() {
