@@ -48,6 +48,7 @@ public class TrackDropper extends MapActivity {
     private TrackDropperLocationListener ll;
     private TrackOverlay trackOverlay;
     private boolean running;
+    private long lastUpdate = 0;
     
     private String base = "http://piracy.heroku.com"; //"http://10.195.80.235:6666";
     
@@ -128,16 +129,18 @@ public class TrackDropper extends MapActivity {
          Uri music = Media.EXTERNAL_CONTENT_URI;
          Cursor cursor = managedQuery(music, projection, null, null, Media.TITLE + " ASC");
          ArrayList<String> titles = new ArrayList<String>();
+         ArrayList<String> trackTitles = new ArrayList<String>();
          ArrayList<String> artists = new ArrayList<String>();
          if (cursor.moveToFirst()) {
              int titleColumn = cursor.getColumnIndex(Media.TITLE);
              int artistColumn = cursor.getColumnIndex(Media.ARTIST);
              do {
-                 titles.add(cursor.getString(titleColumn));
+                 titles.add(cursor.getString(artistColumn) + " - " + cursor.getString(titleColumn));
+                 trackTitles.add(cursor.getString(titleColumn));
                  artists.add(cursor.getString(artistColumn));
              } while (cursor.moveToNext());
          }
-         final ArrayList<String> finaltitles =  titles;
+         final ArrayList<String> finaltitles =  trackTitles;
          final ArrayList<String> finalartists = artists;
          AlertDialog.Builder builder = new AlertDialog.Builder(this);
          builder.setTitle("Pick a track:");
@@ -164,6 +167,10 @@ public class TrackDropper extends MapActivity {
      }
      
      public void updateNearbyTracks() {
+        long now = System.currentTimeMillis();
+        if (now - lastUpdate < 1000 * 10) { 
+            return;
+        }
         GeoPoint point = getLocationListener().getCurrentLocation();
         JSONObject response = getJSON("/tracks.json?lat="+point.getLatitudeE6() / 1000000.0+"&lng="+point.getLongitudeE6()/ 1000000.0);
         trackOverlay.reset();
