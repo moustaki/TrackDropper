@@ -48,13 +48,13 @@ public class TrackOverlay extends ItemizedOverlay {
         Track track = this.tracks.get(index);
         if (track.getDistance() < 20.0) {
             try {
-                this.mp.setDataSource(track.getUrl());
-                this.mp.prepare();
-                this.mp.start();
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 dialog.setTitle("Playing...");
                 dialog.setMessage(track.getTitle() + " - " + track.getSnippet());
                 dialog.show();
+                this.mp.setDataSource(track.getUrl());
+                this.mp.prepare();
+                this.mp.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -100,7 +100,7 @@ public class TrackDropper extends MapActivity {
      
      public boolean onPrepareOptionsMenu(Menu menu) {
          menu.clear();
-         menu.add(0, MENU_DROP_TRACK, 0, "Drop track!");
+         menu.add(0, MENU_DROP_TRACK, 0, "Drop a track!");
          menu.add(0, MENU_QUIT, 0, "Quit");
         return true;
      }
@@ -156,7 +156,13 @@ public class TrackDropper extends MapActivity {
                  data.put("lng", ""+point.getLongitudeE6()/ 1000000.0);
                  data.put("artist_name", artist);
                  data.put("track_name", title);
-                 postJSON("/tracks", data);
+                 final HashMap<String,String> dataToPost = data;
+                 Thread post = new Thread() {
+                     public void run() {
+                         postJSON("/tracks", dataToPost);
+                     }
+                 };
+                 post.start();
                  Toast.makeText(getTrackDropper(), "Posted!", Toast.LENGTH_SHORT).show();
                  return;
              }
